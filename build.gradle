@@ -1,10 +1,18 @@
 plugins {
 	id 'java'
+<<<<<<< HEAD
 	id 'org.springframework.boot' version '3.0.6'
 	id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'com.example'
+=======
+	id 'org.springframework.boot' version '3.0.5'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.ega'
+>>>>>>> 0aad36d2b30550d42ef74568cce8d88dc8b840b8
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
@@ -15,9 +23,17 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+<<<<<<< HEAD
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+=======
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+>>>>>>> 0aad36d2b30550d42ef74568cce8d88dc8b840b8
 }
 
 tasks.named('test') {
