@@ -1,6 +1,7 @@
 package com.ega.ega_api.services;
 
 
+import com.ega.ega_api.dto.Transaction;
 import com.ega.ega_api.entity.Client;
 import com.ega.ega_api.entity.Compte;
 import com.ega.ega_api.repository.ClientRepository;
@@ -123,5 +124,80 @@ public class CompteService {
         var response = this.reponseModel(205, compteToBackUp.get());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    public ResponseEntity<HashMap<Object, Object>> faireDepot(String id, Float montant) {
+        var compteDestination = compteRepository.findById(id);
+        if (compteDestination.isEmpty() || compteDestination.get().isDeleted()) {
+            var response = this.reponseModel(HttpStatus.NOT_FOUND.value(), null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if (montant < 0) {
+            var response = this.reponseModel(HttpStatus.BAD_REQUEST.value(), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        var ancienSolde = compteDestination.get().getSolde();
+        var nouveauSolde = ancienSolde.add(BigDecimal.valueOf(montant));
+        compteDestination.get().setSolde(nouveauSolde);
+        compteRepository.save(compteDestination.get());
+        var response = this.reponseModel(HttpStatus.OK.value(), compteDestination.get());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
+    public ResponseEntity<HashMap<Object, Object>> faireRetrait(String id, Float montant) {
+        var compteDestination = compteRepository.findById(id);
+        if (compteDestination.isEmpty() || compteDestination.get().isDeleted()) {
+            var response = this.reponseModel(HttpStatus.NOT_FOUND.value(), null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if (montant < 0) {
+            var response = this.reponseModel(HttpStatus.BAD_REQUEST.value(), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        var ancienSolde = compteDestination.get().getSolde();
+        if (ancienSolde.compareTo(BigDecimal.valueOf(montant)) <0){
+            var response = this.reponseModel(407, null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        var nouveauSolde = ancienSolde.subtract(BigDecimal.valueOf(montant));
+        compteDestination.get().setSolde(nouveauSolde);
+        compteRepository.save(compteDestination.get());
+        var response = this.reponseModel(HttpStatus.OK.value(), compteDestination.get());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
+    public ResponseEntity<HashMap<Object,Object>> faireVirement(Transaction transactionBody, Float montant)
+    {
+        var compteSource =compteRepository.findById(transactionBody.getIdSource());
+        var compteDestination = compteRepository.findById(transactionBody.getIdDestination());
+        if (compteSource.isEmpty() || compteSource.get().isDeleted() || compteDestination.isEmpty()
+                || compteDestination.get().isDeleted() ){
+            var response = this.reponseModel(HttpStatus.NOT_FOUND.value(), null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if (montant<0){
+            var response = this.reponseModel(HttpStatus.BAD_REQUEST.value(), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        var ancienSoldeSource = compteSource.get().getSolde();
+        var ancienSoldeDestination = compteDestination.get().getSolde();
+        if (ancienSoldeSource.compareTo(BigDecimal.valueOf(montant) ) <0 ){
+            var response = this.reponseModel(407, null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        var nouveauSoldeSource = ancienSoldeSource.subtract(BigDecimal.valueOf(montant));
+        var nouveauSoldeDestination = ancienSoldeDestination.add(BigDecimal.valueOf(montant));
+        compteSource.get().setSolde(nouveauSoldeSource);
+        compteDestination.get().setSolde(nouveauSoldeDestination);
+        compteRepository.save(compteSource.get());
+        compteRepository.save(compteDestination.get());
+
+        var response = this.reponseModel(HttpStatus.OK.value(), compteSource.get());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
 
 }

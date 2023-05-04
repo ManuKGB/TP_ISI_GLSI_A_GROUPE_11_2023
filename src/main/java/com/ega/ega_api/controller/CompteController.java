@@ -1,6 +1,7 @@
 package com.ega.ega_api.controller;
 
 
+import com.ega.ega_api.dto.Transaction;
 import com.ega.ega_api.entity.Compte;
 import com.ega.ega_api.services.CompteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,4 +52,31 @@ public class CompteController {
     public ResponseEntity<HashMap<Object,Object>> backUpCompte(@PathVariable String id){
         return compteService.backupCompte(id);
     }
+
+
+    @PutMapping("/{id}/depot/{montant}")
+    public ResponseEntity<HashMap<Object,Object>> faireDepot(@PathVariable String id , @PathVariable Float montant)
+    {
+        return compteService.faireDepot(id,montant);
+    }
+
+    @PutMapping("/{id}/retrait/{montant}")
+    public ResponseEntity<HashMap<Object,Object>> faireRetrait(@PathVariable String id , @PathVariable Float montant)
+    {
+        return compteService.faireRetrait(id,montant);
+    }
+
+    @PutMapping("/virement/{montant}")
+    public ResponseEntity<HashMap<Object,Object>> faireVirement(@RequestBody Transaction transactionBody,
+                                                                @PathVariable Float montant)
+    {
+        return compteService.faireVirement(transactionBody,montant);
+    }
+
+
+
+
+
+
+
 }
